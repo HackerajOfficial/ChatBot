@@ -33,7 +33,9 @@ This project aims to create a chatbot capable of answering user queries while al
       python manage.py runserver
     ```
 
-5. Open your web browser and navigate to `http://localhost:8000` 
+5. Open your web browser and navigate to `http://localhost:8000`
+
+6. Train ChatBot through Upload .txt Document  `http://localhost:8000/train` 
 
 ## Contributing
 Contributions to enhance the functionality and performance of the chatbot are welcome. If you'd like to contribute, please fork the repository, make your changes, and submit a pull request outlining the modifications.
