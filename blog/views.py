@@ -13,6 +13,9 @@ import spacy
 # Load English language model
 nlp = spacy.load("en_core_web_sm")
 
+
+from .models import UserInfo
+
 def chatbot(userMessage):
     chatbot = ChatBot('Hackeraj')
 
@@ -49,12 +52,18 @@ def blog(request):
 def getResponse(request):
     userMessage = request.GET.get('userMessage')
     print(userMessage)
+
     #call extract information
     name, email, address, phone_number = extract_info(userMessage)
     print("Name:", name)
     print("Email:", email)
     print("Address:", address)
     print("Phone number:", phone_number)
+
+    # Create a UserInfo object and save it to the database
+    user_info = UserInfo.objects.create(name=name, email=email, mobile_number=phone_number, address=address)
+
+
     response = chatbot(userMessage)
     return HttpResponse(response)
 
@@ -81,7 +90,7 @@ def extract_info(message):
     if phone_match:
         phone_number = phone_match.group(0)
 
-    ## Look for keywords indicating an address
+    #Look for keywords indicating an address
     # address_keywords = ['street', 'road', 'avenue', 'city', 'town', 'zip code','live at']
     # for keyword in address_keywords:
     #     if keyword in message.lower():
@@ -90,22 +99,17 @@ def extract_info(message):
     #             address = address_match.group(0)
     #             break
 
-    # Extract address using regular expression
-    address_match = re.search(r'(?:\blive at\b|\bat\b)\s*(.*?)(?=\s|\Z)', message, re.IGNORECASE)
-    if address_match:
-        address = address_match.group(1)
-        
-    # Perform named entity recognition for extracting name, email, address, and phone number
+    # Perform named entity recognition for extracting name, and address
     doc = nlp(message)
     for ent in doc.ents:
         if ent.label_ == 'PERSON':
             name = ent.text
-        # elif ent.label_ == 'GPE':  # Check for geopolitical entities (e.g., locations)
-        #     address = ent.text
-        # elif ent.label_ == 'LOC':  # Check for general locations
-        #     address = ent.text
-        # elif ent.label_ == 'FAC':  # Check for facilities
-        #     address = ent.text
+        elif ent.label_ == 'GPE':  # Check for geopolitical entities (e.g., locations)
+            address = ent.text
+        elif ent.label_ == 'LOC':  # Check for general locations
+            address = ent.text
+        elif ent.label_ == 'FAC':  # Check for facilities
+            address = ent.text
     
     return name, email, address, phone_number
 
