@@ -19,8 +19,8 @@ from .models import UserInfo
 def chatbot(userMessage):
     chatbot = ChatBot('Hackeraj')
 
-    # Create a new trainer for the chatbot
-    trainer = ChatterBotCorpusTrainer(chatbot)
+    # #Create a new trainer for the chatbot
+    # trainer = ChatterBotCorpusTrainer(chatbot)
 
     # # Train the chatbot based on the english corpus
     # trainer.train("chatterbot.corpus.english")
@@ -32,15 +32,18 @@ def chatbot(userMessage):
     # trainer.train("chatterbot.corpus.english.conversations")
 
     # #Custom Train 
-    # trainer = ListTrainer(chatbot)
-    # trainer.train([
-    # "How are you?",
-    # "I am good.",
-    # "That is good to hear.",
-    # "Thank you",
-    # "You're welcome."
-    # ])
+    # list_to_train = [
+    #     "hi",
+    #     "hi, there",
+    #     "what's your name?",
+    #     "i'm just a chatbot.",
+    #     "what's your favorite food?",
+    #     "i like mo:mo"
+    # ]
+    # list_trainer = ListTrainer(chatbot)
+    # list_trainer.train(list_to_train)
 
+    
     response = chatbot.get_response(userMessage)
     return response
 
@@ -114,3 +117,16 @@ def extract_info(message):
     return name, email, address, phone_number
 
 
+def train_through_document(request):
+    if request.method == 'POST' and request.FILES['file']:
+        uploaded_file = request.FILES['file']
+        file_content = uploaded_file.read().decode('utf-8')
+        # Split the content into a list using newline characters as separators
+        list_to_train = file_content.split('\n')
+        # Initialize the chatbot
+        chatbot = ChatBot('Hackeraj')
+        # Create a ListTrainer and train the chatbot
+        list_trainer = ListTrainer(chatbot)
+        list_trainer.train(list_to_train)
+        return HttpResponse('Training successful!')
+    return render(request, template_name='train.html')
